@@ -1,23 +1,24 @@
-# 🛡️ Spring Boot Global Exception Handling API
+#  Spring Boot Global Exception Handling API
 
 A best-practice boilerplate project demonstrating how to handle errors centrally and professionally in Spring Boot applications using `@RestControllerAdvice`.
 
-## 📖 About the Project
+##  About the Project
 
 This project is a boilerplate architecture designed to manage exceptions from a centralized location in Spring Boot applications.
 
 **Why is it necessary?**
 Normally, when an error occurs, Spring Boot returns complex pages that are difficult for Frontend developers to understand (such as the Whitelabel Error Page or long Stack Trace logs). This project intercepts errors on the fly, no matter where they occur in the application, and always delivers a **standard, clean, and predictable JSON** format to the Frontend (React, Angular, Mobile, etc.).
 
-## 🚀 Features
+##  Features
 
 - **Centralized Shield (`@RestControllerAdvice`):** Throw away all those `try-catch` blocks! All errors are managed from a single center.
 - **Standard Response Format (DTO):** The same JSON structure (`timestamp`, `status`, `message`, `path`) is returned for every error case.
 - **Data Validation Management:** When a user enters missing or invalid form data (`@NotBlank`, `@Email`), it catches these errors, lists them, and presents them elegantly in a single JSON (HTTP 400 - Bad Request).
 - **Custom Exceptions:** A custom `ResourceNotFoundException` is thrown and handled when data is not found in the database (HTTP 404 - Not Found).
 - **Framework Errors:** Intercepts structural errors such as unexpected HTTP methods (e.g., sending a GET request when a POST is expected - HTTP 405).
+- **Catch-All Safety Net:** A final fallback handler (`Exception.class`) that catches any unforeseen or unexpected server errors (like `NullPointerException` or database disconnects), guaranteeing the API never returns a raw stack trace, but rather a clean HTTP 500 JSON response.
 
-## 🏗️ Architecture Diagram
+##  Architecture Diagram
 
 ```mermaid
 sequenceDiagram
@@ -34,7 +35,7 @@ sequenceDiagram
     GEH-->>Client: Returns Clean JSON Response
 ```
 
-## 🧪 How to Test? (Postman)
+## How to Test? (Postman)
 
 After starting the project, you can test the following scenarios:
 
@@ -74,7 +75,7 @@ After starting the project, you can test the following scenarios:
 - **URL:** `http://localhost:8080/api/users`
 - **Expected Result (JSON):** JSON response indicating the unsupported HTTP method.
 
-## 🛠️ Technologies
+##  Technologies
 - Java 
 - Spring Boot (Web, Validation)
 - Lombok
