@@ -56,12 +56,26 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex, HttpServletRequest request) {
 
         ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(),
-                request.getRequestURI()
+                LocalDateTime.now(),                 // Zaman: Şimdi
+                HttpStatus.NOT_FOUND.value(),        // Kod: 404
+                ex.getMessage(),                     // Mesaj: Bizim hataya verdiğimiz mesaj
+                request.getRequestURI()              // Yol: İsteğin atıldığı adres (örn: /api/users/99)
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    // Catch-All: Öngörülmeyen tüm hataları yakalayan son kalkan (HTTP 500)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, HttpServletRequest request) {
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "An unexpected error occurred on the server. Please try again later.",
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
