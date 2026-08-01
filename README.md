@@ -2,51 +2,51 @@
 
 A best-practice boilerplate project demonstrating how to handle errors centrally and professionally in Spring Boot applications using `@RestControllerAdvice`.
 
-## 📖 Proje Hakkında (About the Project)
+## 📖 About the Project
 
-Bu proje, Spring Boot uygulamalarında hataları (Exceptions) merkezi bir yerden yönetmek için tasarlanmış bir altyapı (boilerplate) projesidir. 
+This project is a boilerplate architecture designed to manage exceptions from a centralized location in Spring Boot applications.
 
-**Neden Gerekli?** 
-Normalde Spring Boot, hata durumlarında karmaşık ve Frontend geliştiricileri için anlaşılması zor olan sayfalar döndürür (Whitelabel Error Page veya uzun Stack Trace logları). Bu proje; uygulamanın neresinde hata çıkarsa çıksın, hataları havada yakalar ve Frontend'e (React, Angular, Mobil vb.) her zaman **standart, temiz ve anlaşılır bir JSON** formatında iletir.
+**Why is it necessary?**
+Normally, when an error occurs, Spring Boot returns complex pages that are difficult for Frontend developers to understand (such as the Whitelabel Error Page or long Stack Trace logs). This project intercepts errors on the fly, no matter where they occur in the application, and always delivers a **standard, clean, and predictable JSON** format to the Frontend (React, Angular, Mobile, etc.).
 
-## 🚀 Özellikler (Features)
+## 🚀 Features
 
-- **Merkezi Kalkan (`@RestControllerAdvice`):** Tüm `try-catch` bloklarını çöpe atın! Tüm hatalar tek bir merkezden yönetilir.
-- **Standart Yanıt Formatı (DTO):** Her hata durumunda aynı JSON kalıbı (`timestamp`, `status`, `message`, `path`) dönülür.
-- **Validasyon Yönetimi (Data Validation):** Kullanıcının eksik veya hatalı form verileri girdiğinde (`@NotBlank`, `@Email`), bu hataları listeleyip tek bir JSON içinde şıkça gösterir (HTTP 400 - Bad Request).
-- **Özel Hatalar (Custom Exceptions):** Veritabanında veri bulunamadığında fırlatılan özel kurgulanmış `ResourceNotFoundException` (HTTP 404 - Not Found).
-- **Çerçeve Hataları:** Beklenmeyen HTTP metotları (POST yerine GET atılması - HTTP 405) gibi yapısal hataların yakalanması.
+- **Centralized Shield (`@RestControllerAdvice`):** Throw away all those `try-catch` blocks! All errors are managed from a single center.
+- **Standard Response Format (DTO):** The same JSON structure (`timestamp`, `status`, `message`, `path`) is returned for every error case.
+- **Data Validation Management:** When a user enters missing or invalid form data (`@NotBlank`, `@Email`), it catches these errors, lists them, and presents them elegantly in a single JSON (HTTP 400 - Bad Request).
+- **Custom Exceptions:** A custom `ResourceNotFoundException` is thrown and handled when data is not found in the database (HTTP 404 - Not Found).
+- **Framework Errors:** Intercepts structural errors such as unexpected HTTP methods (e.g., sending a GET request when a POST is expected - HTTP 405).
 
-## 🏗️ Mimari Şema
+## 🏗️ Architecture Diagram
 
 ```mermaid
 sequenceDiagram
-    participant Client as İstemci (Postman/Tarayıcı)
+    participant Client as Client (Postman/Browser)
     participant Ctrl as UserController
     participant Svc as UserService
     participant GEH as GlobalExceptionHandler
 
-    Client->>Ctrl: İstek Atar (GET/POST)
-    Ctrl->>Svc: İşlemi Yapar
-    Svc-->>Ctrl: HATA FIRLATIR! (Örn: ResourceNotFoundException)
-    Ctrl-->>GEH: (Hata Global Handler'a seker)
-    GEH->>GEH: ErrorResponse DTO'sunu doldur (404, Zaman, Mesaj)
-    GEH-->>Client: Temiz JSON Yanıtı
+    Client->>Ctrl: Sends Request (GET/POST)
+    Ctrl->>Svc: Processes Data
+    Svc-->>Ctrl: THROWS EXCEPTION! (e.g., ResourceNotFoundException)
+    Ctrl-->>GEH: (Exception bubbles up to Global Handler)
+    GEH->>GEH: Populates ErrorResponse DTO (404, Timestamp, Message)
+    GEH-->>Client: Returns Clean JSON Response
 ```
 
-## 🧪 Nasıl Test Edilir? (Postman)
+## 🧪 How to Test? (Postman)
 
-Projeyi ayağa kaldırdıktan sonra aşağıdaki senaryoları test edebilirsiniz:
+After starting the project, you can test the following scenarios:
 
-### 1. Başarılı İstek (HTTP 200)
-- **Metot:** `GET`
+### 1. Successful Request (HTTP 200)
+- **Method:** `GET`
 - **URL:** `http://localhost:8080/api/users/5`
-- **Beklenen Sonuç:** İşlem başarılı mesajı.
+- **Expected Result:** Success message string.
 
-### 2. Bulunamadı Hatası (HTTP 404)
-- **Metot:** `GET`
+### 2. Not Found Error (HTTP 404)
+- **Method:** `GET`
 - **URL:** `http://localhost:8080/api/users/99`
-- **Beklenen Sonuç (JSON):**
+- **Expected Result (JSON):**
 ```json
 {
     "timestamp": "2026-08-01T12:45:00.123",
@@ -56,25 +56,25 @@ Projeyi ayağa kaldırdıktan sonra aşağıdaki senaryoları test edebilirsiniz
 }
 ```
 
-### 3. Validasyon Hatası (HTTP 400)
-- **Metot:** `POST`
+### 3. Validation Error (HTTP 400)
+- **Method:** `POST`
 - **URL:** `http://localhost:8080/api/users`
 - **Body (JSON):**
 ```json
 {
     "name": "",
-    "email": "hatali-mail-adresi",
+    "email": "invalid-email-address",
     "password": "123"
 }
 ```
-- **Beklenen Sonuç (JSON):** Her bir hatalı alan için detaylı validasyon listesi.
+- **Expected Result (JSON):** A detailed list of validation errors for each invalid field.
 
-### 4. Yanlış HTTP Metodu Hatası (HTTP 405)
-- **Metot:** `GET` *(Normalde POST atılması gereken yere)*
+### 4. Method Not Allowed Error (HTTP 405)
+- **Method:** `GET` *(To an endpoint that only expects POST)*
 - **URL:** `http://localhost:8080/api/users`
-- **Beklenen Sonuç (JSON):** Desteklenmeyen HTTP metoduna dair JSON yanıtı.
+- **Expected Result (JSON):** JSON response indicating the unsupported HTTP method.
 
-## 🛠️ Teknolojiler
+## 🛠️ Technologies
 - Java 
 - Spring Boot (Web, Validation)
 - Lombok
