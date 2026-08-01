@@ -35,6 +35,47 @@ sequenceDiagram
     GEH-->>Client: Returns Clean JSON Response
 ```
 
+### Flowchart (Exception Routing)
+
+```mermaid
+flowchart TD
+    Req([Incoming Request]) --> Layer{Controller / Service}
+    Layer -- "Success" --> Res([Return HTTP 200])
+    Layer -- "Throws Exception" --> Shield((@RestControllerAdvice))
+    
+    Shield --> Type{Exception Type?}
+    Type -- "ResourceNotFoundException" --> Ex404[Status 404]
+    Type -- "MethodArgumentNotValidException" --> Ex400[Status 400 + Validation Map]
+    Type -- "HttpRequestMethodNotSupported" --> Ex405[Status 405]
+    Type -- "Any other Exception" --> Ex500[Status 500 Catch-All]
+    
+    Ex404 --> DTO[Format as ErrorResponse DTO]
+    Ex400 --> DTO
+    Ex405 --> DTO
+    Ex500 --> DTO
+    
+    DTO --> Final([Return Clean JSON to Client])
+    
+    style Shield fill:#e1bee7,stroke:#8e24aa,stroke-width:2px,color:#000
+    style DTO fill:#c8e6c9,stroke:#388e3c,stroke-width:2px,color:#000
+    style Final fill:#bbdefb,stroke:#1976d2,stroke-width:2px,color:#000
+```
+
+## 🤝 How to Use This in Your Own Projects?
+
+This project is a boilerplate designed to be integrated into actual Spring Boot applications. You can use it in your company or personal projects in the following ways:
+
+### 1. Copy-Paste (The Boilerplate Approach)
+If you are building a small/medium Spring Boot project, simply copy these three files into your project:
+*   `ErrorResponse.java`
+*   `ResourceNotFoundException.java`
+*   `GlobalExceptionHandler.java`
+
+Thanks to the `@RestControllerAdvice` annotation, Spring Boot will automatically detect it, and your new project will instantly have professional exception handling!
+
+### 2. GitHub Template
+You can set this repository as a **Template Repository** on GitHub. When starting a new microservice or API, click **"Use this template"**. You will get a brand new repository with this exception handling architecture already built-in, saving you from writing boilerplate code.
+
 
 ## How to Test? (Postman)
 
